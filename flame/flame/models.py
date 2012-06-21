@@ -1,28 +1,19 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    Text,
-    )
+class Screen(object):
+    __name__ = 'screen'
 
-from sqlalchemy.ext.declarative import declarative_base
+    def __getitem__(self, screen_alias):
+        return Command(screen_alias)
 
-from sqlalchemy.orm import (
-    scoped_session,
-    sessionmaker,
-    )
+class Command(object):
+    __name__ = 'command'
 
-from zope.sqlalchemy import ZopeTransactionExtension
+    def __init__(self, screen_alias):
+        self.screen_alias = screen_alias
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-Base = declarative_base()
+    def __getitem__(self, command_alias):
+        return "Command: {command} for screen {screen}".format(
+            command=command_alias,
+            screen=self.screen_alias
+        )
 
-class MyModel(Base):
-    __tablename__ = 'models'
-    id = Column(Integer, primary_key=True)
-    name = Column(Text, unique=True)
-    value = Column(Integer)
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
 

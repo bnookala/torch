@@ -1,4 +1,8 @@
 .DS_Store
 .Python
 
+*.pyc
+*.db
+
 flame/venv
+wick/venv
