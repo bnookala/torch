@@ -1,19 +1,20 @@
-class Screen(object):
-    __name__ = 'screen'
+import config
 
-    def __getitem__(self, screen_alias):
-        return Command(screen_alias)
+
+class Screen(object):
+    def __getitem__(self, name):
+        if name in config.screen_list:
+            return Command(screen=name)
+        else:
+            return Command(name)
 
 class Command(object):
-    __name__ = 'command'
+    def __init__(self, screen=None):
+        self.screen = screen
+        self.command = None
 
-    def __init__(self, screen_alias):
-        self.screen_alias = screen_alias
-
-    def __getitem__(self, command_alias):
-        return "Command: {command} for screen {screen}".format(
-            command=command_alias,
-            screen=self.screen_alias
-        )
-
+    def __getitem__(self, cmd):
+        if not self.command and cmd in config.cmd_list:
+            self.command = cmd
+        return self
 
