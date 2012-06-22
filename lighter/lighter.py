@@ -55,9 +55,11 @@ def show(screen):
     pass
 
 @app.route('/<screen>/close', methods=['GET'])
-@control_access
 def close(screen):
-    pass
+    host = _get_host_or_404(screen)
+
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'close_tab'))
+    return json.dumps(wick_req.json)
 
 @app.route('/<screen>/refresh', methods=['GET'])
 @control_access
@@ -68,15 +70,18 @@ def refresh(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
-@control_access
 def next(screen):
     host = _get_host_or_404(screen)
-    pass
 
-@app.route('/<screen>/previous', methods=['GET'])
-@control_access
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'next_tab'))
+    return json.dumps(wick_req.json)
+
+@app.route('/<screen>/prev', methods=['GET'])
 def previous(screen):
-    pass
+    host = _get_host_or_404(screen)
+
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'prev_tab'))
+    return json.dumps(wick_req.json)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0')
