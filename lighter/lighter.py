@@ -25,9 +25,9 @@ def _screen_to_prefix(screen):
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
-        passed_channel = request.headers.get('X-Channel')
-        if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen), {}):
-            return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
+        channel = request.headers.get('X-Channel')
+        if channel not in config.prefix_to_channels.get(_screen_to_prefix(screen), {}):
+            return "you can't fuck with %s from %s, %s" % (screen, channel, (user or 'jerk'))
         return fn(screen)
     return wrapped
 
@@ -162,7 +162,7 @@ def register_prefix():
 
 @app.route('/<screen>/rotate', methods=['GET'])
 @control_access
-def rotate():
+def rotate(screen):
     host = _get_host_or_404(screen)
     rotate = request.args['enabled']
     if not rotate:
