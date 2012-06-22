@@ -2,51 +2,56 @@ import json
 
 from flask import Flask, request
 
-import applescripts
 import browser
 
 app = Flask(__name__)
 
+def browser_action(fn, screen, *args):
+	"To save some typing. args are expected params in the request."
+	fn(screen, *(request.form[arg] for arg in args))
+	return 'ok'
+
 @app.route('/enumerate', methods=['POST'])
 def enumerate():
+	#TODO we should index the windows based on their unique ids
 	return 'ok'
 
 @app.route('/<screen>/tabs', methods=['GET'])
 def tabs(screen):
-	return json.dumps(browser.get_tab_urls(screen))
+	return json.dumps(browser.get_tab_info(screen))
+
+@app.route('/<screen>/active_tab', methods=['GET'])
+def active_tab(screen):
+	return json.dumps(browser.get_active_tab(screen))
 
 @app.route('/<screen>/restart', methods=['POST'])
 def restart(screen):
-	applescripts.run_script(applescripts.RESTART_CHROME)
-	return 'ok'
+	return browser_action(browser.restart_chrome, screen)
 
-@app.route('/<screen>/show', methods=['POST'])
-def show(screen):
-	# will be a tab index or url
-	to_show = request.form['to_show']
-	print to_show
-	for index, url in browser.get_tab_urls(screen).iteritems():
-		if to_show in url:
-			#TODO activate tab #index
-			break
-	browser.new_tab(screen, to_show)
-	return 'ok'
+@app.route('/<screen>/new_tab', methods=['POST'])
+def new_tab(screen):
+	browser.new_tab(screen, request.form['url'])
+	return json.dumps(browser.get_tab_info(screen))
+
+@app.route('/<screen>/activate_tab', methods=['POST'])
+def activate_tab(screen):
+	return browser_action(browser.activate_tab, screen, 'index')
 
 @app.route('/<screen>/reload', methods=['POST'])
 def reload(screen):
-	return 'ok'
-
-@app.route('/<screen>/next_tab', methods=['POST'])
-def next_tab(screen):
-	return 'ok'
-
-@app.route('/<screen>/prev_tab', methods=['POST'])
-def prev_tab(screen):
-	return 'ok'
+	return browser_action(browser.reload_tab, screen, 'index')
 
 @app.route('/<screen>/close_tab', methods=['POST'])
 def close_tab(screen):
-	return 'ok'
+	return browser_action(browser.close_tab, screen, 'index')
+
+@app.route('/<screen>/next_tab', methods=['POST'])
+def next_tab(screen):
+	return browser_action(browser.next_tab, screen)
+
+@app.route('/<screen>/prev_tab', methods=['POST'])
+def prev_tab(screen):
+	return browser_action(browser.prev_tab, screen)
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0')
