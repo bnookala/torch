@@ -135,7 +135,7 @@ def show(screen):
         # Tab index means we can just activate the specific tab instance
         wick_req = requests.post(
                         _stringify_request_uri(host, screen, 'activate_tab'),
-                        data={'index': index}
+                        data={'index': str(index)}
                     )
         return "ok"
     else:
