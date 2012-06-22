@@ -71,7 +71,7 @@ def fullscreen_off(screen):
 def execute(screen):
 	return browser_action(browser.execute_script, screen, 'script')
 
-@app.route('/enumerate', methods=['POST'])
+@app.route('/enumerate', methods=['GET'])
 def enumerate_screens():
 	return json.dumps(browser.enumerate_screens())
 
