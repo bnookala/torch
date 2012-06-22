@@ -152,6 +152,15 @@ def register_prefix():
     print config.wick_daemons
     return 'ok'
 
+@app.route('/<screen>/rotate', methods=['GET'])
+@control_access
+def rotate():
+    host = _get_host_or_404(screen)
+    rotate = request.args['enabled']
+    if not rotate:
+        abort(404)
+    return 'ok'
+
 if __name__ == "__main__":
     app.debug=True
     app.run(host='0.0.0.0')
