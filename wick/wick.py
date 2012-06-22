@@ -16,9 +16,12 @@ def _register_prefix():
 	})
 
 def browser_action(fn, screen, *args):
-	"To save some typing. args are expected params in the request."
-	fn(screen, *(request.form[arg] for arg in args))
-	return 'ok'
+	if screen not in browser.locked_screens:
+		"To save some typing. args are expected params in the request."
+		fn(screen, *(request.form[arg] for arg in args))
+		return 'ok'
+	else:
+		return '%s is currently locked' % screen
 
 @app.route('/<screen>/tabs', methods=['GET'])
 def tabs(screen):
@@ -70,6 +73,10 @@ def fullscreen_off(screen):
 @app.route('/<screen>/execute', methods=['POST'])
 def execute(screen):
 	return browser_action(browser.execute_script, screen, 'script')
+
+@app.route('/<screen>/lock', methods=['POST'])
+def toggle_screen(screen):
+	return browser.toggle_screen(screen)
 
 @app.route('/enumerate', methods=['GET'])
 def enumerate_screens():

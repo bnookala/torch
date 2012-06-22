@@ -4,6 +4,7 @@ import javascripts
 
 #TODO make this not a stupid global
 ids_to_screen_names = None
+locked_screens = []
 
 def _refresh_ids():
 	"Track the ids of all the open browser windows."
@@ -110,6 +111,15 @@ def list_screens():
 	global ids_to_screen_names
 	_refresh_ids()
 	return sorted(ids_to_screen_names.values())
+
+def toggle_screen(screen):
+	global locked_screens
+	if screen in locked_screens:
+		locked_screens.remove(screen)
+		return 'unlocking ' + screen
+	else:
+		locked_screens.append(screen)
+		return 'locking ' + screen
 
 def enumerate_screens():
 	names = list_screens()
