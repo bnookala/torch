@@ -57,13 +57,13 @@ def next_tab(screen):
 def prev_tab(screen):
 	return browser_action(browser.prev_tab, screen)
 
-@app.route('/<screen>/presentation_mode_on', methods=['POST'])
-def presentation_mode_on(screen):
+@app.route('/<screen>/fullscreen_on', methods=['POST'])
+def fullscreen_on(screen):
 	browser.presentation_mode(screen, True)
 	return 'ok'
 
-@app.route('/<screen>/presentation_mode_off', methods=['POST'])
-def presentation_mode_off(screen):
+@app.route('/<screen>/fullscreen_off', methods=['POST'])
+def fullscreen_off(screen):
 	browser.presentation_mode(screen, False)
 	return 'ok'
 
