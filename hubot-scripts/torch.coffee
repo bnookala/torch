@@ -11,32 +11,48 @@
 
 qs = require 'querystring'
 
-TORCH_ADDRESS = 'localhost:9001'
+TORCH_ADDRESS = '127.0.0.1:9001'
 
-tellTorch = (msg, command, screen, extra) ->
+tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
-  msg.http('http://#{TORCH_ADDRESS}')
-    .path('/#{screen}/#{command}?#{data}')
-    .header('X-Username', msg.message.user.name)
+
+  msg.http('http://#{TORCH_ADDRESS}/#{path}?#{data}')
+    .header('X-User', msg.message.user.name)
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
       if res.statusCode == 200
+        body = JSON.parse body
+        if body.success? and not body.success
+          msg.send body.msg
+          return
         msg.send body
       else
         msg.send err
 
 module.exports = (robot) ->
   robot.respond /list screens$/i, (msg) ->
-    tellTorch msg, 'list', undefined, {}
+    tellTorch msg, 'list'
+
   robot.respond /show screens$/i, (msg) ->
-    tellTorch msg, 'enumerate', undefined, {}
+    tellTorch msg, 'enumerate'
+
   robot.respond /list tabs on (\w+)$/i, (msg) ->
-    tellTorch msg, 'list', msg.match[1], {}
+    tellTorch msg, '#{msg.match[1]}/list'
+
   robot.respond /what's on (\w+)$/i, (msg) ->
-    tellTorch msg, 'details', msg.match[1], {}
+    tellTorch msg, '#{msg.match[1]}/details'
+
   robot.respond /show (\S+) on (\w+)$/i, (msg) ->
-    tellTorch msg, 'show', msg.match[2], {'cmd': msg.match[1]}
+    tellTorch msg, '#{msg.match[2]}/show', {'cmd': msg.match[1]}
+
   robot.respond /close tab on (\w+$)/i, (msg) ->
-    tellTorch msg, 'close', msg.match[1], {}
+    tellTorch msg, '#{msg.match[1]}/close'
+
   robot.respond /refresh (\w+$)/i, (msg) ->
-    tellTorch msg, 'refresh', msg.match[1], {}
+    tellTorch msg, '#{msg.match[1]}/refresh'
+
+  robot.respond /next (\w+$)/i, (msg) ->
+    tellTorch msg, '#{msg.match[1]}/next'
+
+  robot.respond /prev(ious)? (\w+$)/i, (msg) ->
+    tellTorch msg, '#{msg.match[1]}/previous'
