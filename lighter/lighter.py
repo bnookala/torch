@@ -1,5 +1,16 @@
-from flask import Flask, request
+import config
+import json
+import requests
+from flask import Flask, request, abort
 app = Flask(__name__)
+
+def _get_host_or_404(screen):
+    host = config.wick_daemons.get(screen, None)
+
+    if not host:
+        abort(404)
+
+    return host
 
 @app.route('/list', methods=['GET'])
 def list():
@@ -11,11 +22,17 @@ def enumerate():
 
 @app.route('/<screen>/list', methods=['GET'])
 def list_tabs(screen):
-    pass
+    host = _get_host_or_404(screen)
+
+    wick_req = requests.get('http://' + host + '/' + screen + '/tabs')
+    return str(wick_req.json)
 
 @app.route('/<screen>/details', methods=['GET'])
 def tab_details(screen):
-    pass
+    host = _get_host_or_404(screen)
+
+    wick_req = requests.get('http://' + host + '/' + screen + '/active_tab')
+    return str(wick_req.json)
 
 @app.route('/<screen>/show', methods=['GET'])
 def show(screen):
