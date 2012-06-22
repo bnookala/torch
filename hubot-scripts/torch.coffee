@@ -72,3 +72,6 @@ module.exports = (robot) ->
 
   robot.respond /stop rotating (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/rotate", {'enabled': false}
+
+  robot.respond /peek(\sat)? (\S+) on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[3]}/peek", {'url': msg.match[2]}
