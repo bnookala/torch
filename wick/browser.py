@@ -96,7 +96,7 @@ def get_tab_info(screen):
 		result[index + 1] = {'url': url, 'title': title}
 	return result
 
-def execute_script(screen, script):
+def execute_script(screen, script, by_url=False):
 	applescripts.run_script(applescripts.EXECUTE_SCRIPT % {
 		'window': _screen_index(screen),
 		'script': script.replace('"', '\\"').replace('\n',''),
@@ -116,3 +116,9 @@ def enumerate_screens():
 	for name in names:
 		show_big_text(name, name)
 	return names
+
+def inject_nyanwin(screen, lighter_host):
+	applescripts.run_script(applescripts.INJECT_NYANWIN % {
+		'window': _screen_index(screen),
+		'nyanwinDoneUrl': 'http://' + lighter_host + ':5000/nyanwin_done?screen=' + screen,
+	})

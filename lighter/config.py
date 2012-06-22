@@ -35,3 +35,6 @@ wick_daemons = {
 	#TODO remove
 	'bomb': '10.10.7.110:5000'
 }
+
+nyanwinning = False
+nyanwin_queue = []

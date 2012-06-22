@@ -79,6 +79,11 @@ def enumerate_screens():
 def list_screens():
 	return json.dumps(browser.list_screens())
 
+@app.route('/<screen>/nyanwin', methods=['POST'])
+def nyanwin(screen):
+	browser.inject_nyanwin(screen, request.remote_addr)
+	return 'ok'
+
 if __name__ == "__main__":
 	_register_prefix()
 	app.run(host='0.0.0.0', port=config.port, debug=True)

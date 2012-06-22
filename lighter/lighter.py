@@ -259,6 +259,30 @@ def peek(screen):
     subprocess.Popen(args)
     return "ok, peaking at " + url
 
+@app.route('/nyanwin', methods=['GET'])
+def nyanwin():
+    if config.nyanwinning:
+        return 'be patient'
+    config.nyanwinning = True
+    # screens should be something like 'consumer1,consumer3,test2'
+    config.nyanwin_queue = request.args['screens'].split(',')
+    return _next_nyanwin()
+
+@app.route('/nyanwin_done', methods=['GET'])
+def nyanwin_done():
+    "When one nyanwin is done, queue up the next."
+    return _next_nyanwin()
+
+def _next_nyanwin():
+    if not config.nyanwin_queue:
+        config.nyanwinning = False
+        return 'ok'
+    screen = config.nyanwin_queue[0]
+    config.nyanwin_queue = config.nyanwin_queue[1:]
+    host = _get_host_or_404(screen)
+    requests.post(_stringify_request_uri(host, screen, 'nyanwin'))
+    return 'ok'
+
 if __name__ == "__main__":
     if not os.path.exists('rotate_pids'):
         rotate_pids = {}

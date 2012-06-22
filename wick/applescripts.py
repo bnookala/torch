@@ -100,6 +100,12 @@ tell application "Google Chrome"
 end tell
 """
 
+INJECT_NYANWIN = """
+tell application "Google Chrome"
+	set URL of active tab of window %(window)s to "javascript:window.nyanwinDoneUrl='%(nyanwinDoneUrl)s';var s=document.createElement('script');s.src='http://people.yelpcorp.com/~mwilson/nyanwin.js';document.getElementsByTagName('head')[0].appendChild(s);"
+end tell
+"""
+
 def run_script(script):
 	p = Popen('osascript', stdout=PIPE, stdin=PIPE, stderr=STDOUT)
 	result = p.communicate(input=script)[0]
