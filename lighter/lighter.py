@@ -15,23 +15,30 @@ def _get_host_or_404(screen):
 def _stringify_request_uri(host, screen, cmd):
     return 'http://' + host + '/' + screen + '/' + cmd
 
+def _stringify_simple_uri(host, cmd):
+    return 'http://' + host + '/' + cmd
+
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
-        needed_channel = config.screen_to_channel(screen)
-        if passed_channel != needed_channel:
+        if passed_channel not in config.screen_to_channels(screen):
             return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % user})
         return fn(screen)
     return wrapped
 
 @app.route('/list', methods=['GET'])
 def list():
-    pass
+    channel = request.headers.get('X-Channel', None)
+    if channel:
+        return json.dumps(config.channel_to_screens[channel])
 
 @app.route('/enumerate', methods=['GET'])
 def enumerate():
-    pass
+    channel = request.headers.get('X-Channel', None)
+    if channel:
+        for screen in config.channel_to_screens[channel]:
+            res = requests.post(_stringify_simple_uri(_get_host_or_404(screen), screen, 'enumerate'))
 
 @app.route('/<screen>/list', methods=['GET'])
 @control_access
