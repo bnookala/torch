@@ -20,13 +20,12 @@ def _stringify_simple_uri(host, cmd):
     return 'http://' + host + '/' + cmd
 
 def _screen_to_prefix(screen):
-	return re.match(r'(.*[^0-9])[0-9]+', screen)
+    return re.match(r'(.*[^0-9])[0-9]+', screen)
 
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
-        import ipdb; ipdb.set_trace()
         if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen).group(1), {}):
             return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
         return fn(screen)
@@ -148,10 +147,10 @@ def previous(screen):
 
 @app.route('/register_prefix', methods=['POST'])
 def register_prefix():
-	config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
-	print "wick daemons:"
-	print config.wick_daemons
-	return 'ok'
+    config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
+    print "wick daemons:"
+    print config.wick_daemons
+    return 'ok'
 
 if __name__ == "__main__":
     app.debug=True
