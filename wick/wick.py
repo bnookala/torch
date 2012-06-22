@@ -7,6 +7,10 @@ import browser
 
 app = Flask(__name__)
 
+@app.route('/execute', methods=['POST']):
+	script = request.form['script']
+	return 'ok'
+
 @app.route('/enumerate', methods=['POST'])
 def enumerate():
 	return 'ok'

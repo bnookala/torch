@@ -18,3 +18,6 @@ def get_tab_urls(screen):
 	# Last 2 lines returned by GET_TAB_URLS will be newlines
 	url_lines = url_lines.split('\n')[:-2]
 	return dict(zip(range(1,len(url_lines)+1), url_lines))
+
+def insert_script_in_active_tab(screen):
+	return
