@@ -62,3 +62,6 @@ def get_tab_info(screen):
 		url, title = line.split(' ', 1)
 		result[index + 1] = {'url': url, 'title': title}
 	return result
+
+def insert_script_in_active_tab(screen):
+	return

@@ -11,6 +11,11 @@ def browser_action(fn, screen, *args):
 	fn(screen, *(request.form[arg] for arg in args))
 	return 'ok'
 
+@app.route('/<screen>/execute', methods=['POST'])
+def execute(screen):
+	script = request.form['script']
+	return 'ok'
+
 @app.route('/enumerate', methods=['POST'])
 def enumerate():
 	#TODO we should index the windows based on their unique ids
