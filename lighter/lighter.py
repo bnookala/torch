@@ -1,7 +1,11 @@
 import config
 import json
+import os
+import cPickle as pickle
 import re
 import requests
+import signal
+import subprocess
 from flask import Flask, request, abort
 app = Flask(__name__)
 
@@ -153,14 +157,47 @@ def register_prefix():
     return 'ok'
 
 @app.route('/<screen>/rotate', methods=['GET'])
-@control_access
-def rotate():
+def rotate(screen):
     host = _get_host_or_404(screen)
     rotate = request.args['enabled']
+    time_delay = request.args.get('time', None)
     if not rotate:
         abort(404)
-    return 'ok'
+    if not time_delay:
+        time_delay = 5
+
+    f = open('rotate_pids', 'r+')
+    pickled_pids = pickle.load(f)
+    f.close()
+    pid = pickled_pids.get(screen, None)
+
+    if rotate == "true":
+        if not pid:
+            args = ['./rotate.py', host, screen, str(time_delay)]
+            process = subprocess.Popen(args)
+            pickled_pids[screen] = process
+        else:
+            return "Already rotating!"
+    else:
+        if pid:
+            pid.terminate()
+            del pickled_pids[screen]
+        else:
+            return "Not rotating!"
+
+    os.remove('rotate_pids')
+    f = open('rotate_pids', 'w+')
+    pickle.dump(pickled_pids, f)
+    f.close()
+
+    return "ok"
 
 if __name__ == "__main__":
+    if not os.path.exists('rotate_pids'):
+        rotate_pids = {}
+        f = open('rotate_pids', 'w')
+        pickle.dump(rotate_pids, f)
+        f.close()
+
     app.debug=True
     app.run(host='0.0.0.0')
