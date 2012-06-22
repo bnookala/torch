@@ -51,10 +51,10 @@ module.exports = (robot) ->
   robot.respond /refresh (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/refresh"
 
-  robot.respond /show next (\w+)$/i, (msg) ->
+  robot.respond /next tab on (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/next"
 
-  robot.respond /show prev(ious)? (\w+)$/i, (msg) ->
+  robot.respond /prev(ious)? tab on (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[2]}/prev"
 
   robot.respond /fullscreen on (\w+)$/i, (msg) ->
