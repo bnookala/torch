@@ -54,7 +54,6 @@ def enumerate_screens():
 	return "enumerating..."
 
 @app.route('/<screen>/list', methods=['GET'])
-@control_access
 def list_tabs(screen):
     host = _get_host_or_404(screen)
 
@@ -62,7 +61,6 @@ def list_tabs(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/details', methods=['GET'])
-@control_access
 def tab_details(screen):
     host = _get_host_or_404(screen)
 
@@ -122,7 +120,6 @@ def show(screen):
             return "ok"
 
 @app.route('/<screen>/close', methods=['GET'])
-@control_access
 def close(screen):
     host = _get_host_or_404(screen)
 
@@ -130,7 +127,6 @@ def close(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/refresh', methods=['GET'])
-@control_access
 def refresh(screen):
     host = _get_host_or_404(screen)
 
@@ -138,7 +134,6 @@ def refresh(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
-@control_access
 def next(screen):
     host = _get_host_or_404(screen)
 
@@ -146,7 +141,6 @@ def next(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/prev', methods=['GET'])
-@control_access
 def previous(screen):
     host = _get_host_or_404(screen)
 
@@ -161,7 +155,6 @@ def register_prefix():
     return 'ok'
 
 @app.route('/<screen>/rotate', methods=['GET'])
-@control_access
 def rotate(screen):
     host = _get_host_or_404(screen)
     rotate = request.args['enabled']
