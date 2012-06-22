@@ -29,6 +29,19 @@ CLOSE_TAB = """
 tell application "Google Chrome" to close active tab of window %(window)s
 """
 
+# Newline-delimited list of id x1 y1 x2 y2
+GET_WINDOW_IDS_AND_BOUNDS = """
+set res to ""
+tell application "Google Chrome"
+	repeat with w in windows of application "Google Chrome"
+		set b to bounds of w
+		set res to res & (id of w) & " " & (item 1 of b) & " " & (item 2 of b) & " " & (item 3 of b) & " " & (item 4 of b) & "
+"
+	end repeat
+end tell
+get res
+"""
+
 GET_NUM_WINDOWS = """
 set c to 0
 tell application "Google Chrome"

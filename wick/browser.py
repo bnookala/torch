@@ -9,11 +9,14 @@ def _refresh_ids():
 	"Track the ids of all the open browser windows."
 	global ids_to_screen_names
 	ids_to_screen_names = {}
-	num_windows = int(applescripts.run_script(applescripts.GET_NUM_WINDOWS))
-	for i in xrange(1, num_windows + 1):
-		id = applescripts.run_script(applescripts.GET_WINDOW_ID_FROM_INDEX % {'window': i}).strip()
-		screen_name = config.screen_name_prefix + str(i)
-		ids_to_screen_names[id] = screen_name
+	ids_and_bounds = applescripts.run_script(applescripts.GET_WINDOW_IDS_AND_BOUNDS)
+	ids_and_bounds = ids_and_bounds.strip().split('\n')
+	ids_and_bounds = [line.strip().split(' ') for line in ids_and_bounds]
+	# sort by distance from top left, with more weight on y
+	comp = lambda line: int(line[1]) ** 2 + int(line[2]) ** 3
+	for i, line in enumerate(sorted(ids_and_bounds, key=comp)):
+		screen_name = config.screen_name_prefix + str(i + 1)
+		ids_to_screen_names[line[0]] = screen_name
 
 def _screen_index(screen_name):
 	"""
@@ -109,5 +112,7 @@ def list_screens():
 	return sorted(ids_to_screen_names.values())
 
 def enumerate_screens():
-	for name in list_screens():
+	names = list_screens()
+	for name in names:
 		show_big_text(name, name)
+	return names
