@@ -1,12 +1,44 @@
 import applescripts
+import config
+import javascripts
+
+#TODO make this not a stupid global
+ids_to_screen_names = None
+
+def _refresh_ids():
+	"Track the ids of all the open browser windows."
+	global ids_to_screen_names
+	ids_to_screen_names = {}
+	num_windows = int(applescripts.run_script(applescripts.GET_NUM_WINDOWS))
+	for i in xrange(1, num_windows + 1):
+		id = applescripts.run_script(applescripts.GET_WINDOW_ID_FROM_INDEX % {'window': i}).strip()
+		screen_name = config.screen_name_prefix + str(i)
+		ids_to_screen_names[id] = screen_name
 
 def _screen_index(screen_name):
-	"Convert a screen name like consumer1 into its window index for AppleScript"
-	#TODO
-	return 1
+	"""
+	Convert a screen name like consumer1 into its window index for AppleScript.
+	We have a mapping of name->id but AppleScript seems to index only by window index.
+	"""
+	global ids_to_screen_names
+	if not ids_to_screen_names:
+		_refresh_ids()
+	num_windows = int(applescripts.run_script(applescripts.GET_NUM_WINDOWS))
+	for i in xrange(1, num_windows + 1):
+		id = applescripts.run_script(applescripts.GET_WINDOW_ID_FROM_INDEX % {'window': i}).strip()
+		if ids_to_screen_names.get(id) == screen_name:
+			return i
+
+	raise Exception("Screen name %s not found" % screen_name)
 
 def restart_chrome(screen):
 	applescripts.run_script(applescripts.RESTART_CHROME)
+
+def presentation_mode(screen, toggle):
+	applescripts.run_script(applescripts.PRESENTATION_MODE % {
+		'window': _screen_index(screen),
+		'enter_or_exit': 'enter' if toggle else 'exit',
+	})
 
 def new_tab(screen, url):
 	applescripts.run_script(applescripts.NEW_TAB % {
@@ -20,16 +52,14 @@ def activate_tab(screen, index):
 		'tab': index,
 	})
 
-def reload_tab(screen, index):
+def reload_tab(screen):
 	applescripts.run_script(applescripts.RELOAD_TAB % {
 		'window': _screen_index(screen),
-		'tab': index,
 	})
 
-def close_tab(screen, index):
+def close_tab(screen):
 	applescripts.run_script(applescripts.CLOSE_TAB % {
 		'window': _screen_index(screen),
-		'tab': index,
 	})
 
 def next_tab(screen):
@@ -46,7 +76,7 @@ def get_active_tab(screen):
 	info = applescripts.run_script(applescripts.GET_ACTIVE_TAB % {
 		'window': _screen_index(screen),
 	})
-	index, url, title = info.split(' ', 2)
+	index, url, title = info.strip().split(' ', 2)
 	return {'index': int(index), 'url': url, 'title': title}
 
 def get_tab_info(screen):
@@ -54,14 +84,27 @@ def get_tab_info(screen):
 	tab_lines = applescripts.run_script(applescripts.GET_TAB_INFO % {
 		'window': _screen_index(screen),
 	})
-	# Last 2 lines returned will be newlines
-	tab_lines = tab_lines.split('\n')[:-2]
+	tab_lines = tab_lines.strip().split('\n')
 	# Convert space-delimited urls and titles
 	result = {}
 	for index, line in enumerate(tab_lines):
-		url, title = line.split(' ', 1)
+		url, title = line.split(' ', 1) if ' ' in line else (line, line)
 		result[index + 1] = {'url': url, 'title': title}
 	return result
 
-def insert_script_in_active_tab(screen):
-	return
+def execute_script(screen, script):
+	applescripts.run_script(applescripts.EXECUTE_SCRIPT % {
+		'window': _screen_index(screen),
+		'script': script.replace('"', '\\"').replace('\n',''),
+	})
+
+def show_big_text(screen, text):
+	# ugh i feel so so dirty
+	execute_script(screen, javascripts.SHOW_BIG_TEXT % {'text': text.replace('"', '\\"')})
+
+def enumerate_tabs():
+	global ids_to_screen_names
+	_refresh_ids()
+	for name in ids_to_screen_names.values():
+		show_big_text(name, name)
+	return sorted(ids_to_screen_names.values())

@@ -1,8 +1,8 @@
 from subprocess import Popen, PIPE, STDOUT
 
-CHANGE_TAB_INDEX = """
+PRESENTATION_MODE = """
 tell application "Google Chrome"
-	set active tab index of first window to %(index)s
+	tell window %(window)s to %(enter_or_exit)s presentation mode
 end tell
 """
 
@@ -21,14 +21,26 @@ end tell
 
 RELOAD_TAB = """
 tell application "Google Chrome"
-	tell tab %(tab)s of window %(window)s of application "Google Chrome" to reload
+	tell active tab of window %(window)s of application "Google Chrome" to reload
 end tell
 """
 
 CLOSE_TAB = """
+tell application "Google Chrome" to close active tab of window %(window)s
+"""
+
+GET_NUM_WINDOWS = """
+set c to 0
 tell application "Google Chrome"
-	tell tab %(tab)s of window %(window)s of application "Google Chrome" to close
+	repeat with w in windows of application "Google Chrome"
+		set c to (c + 1)
+	end repeat
 end tell
+get c
+"""
+
+GET_WINDOW_ID_FROM_INDEX = """
+tell application "Google Chrome" to get id of window %(window)s
 """
 
 # Returns '<index> <url> <title>'
@@ -66,6 +78,13 @@ tell application "Terminal"
 end tell
 delay 1
 tell application "Google Chrome" to activate
+"""
+
+# Make sure " in the script is converted to \"
+EXECUTE_SCRIPT = """
+tell application "Google Chrome"
+	execute active tab of window %(window)s javascript "%(script)s"
+end tell
 """
 
 def run_script(script):
