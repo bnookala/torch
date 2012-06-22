@@ -18,11 +18,10 @@ from collections import defaultdict
 #        tabs..
 
 prefix_to_channels = {
-    'bomb': ['#chrome', '#marley', '#consumer'],
-    'test': ['#chrome', '#marley', '#consumer'],
-    'testB': ['#chrome', '#marley', '#consumer'],
-    'mark': ['#chrome', '#marley', '#consumer'],
-    'bhargav': ['#chrome', '#marley', '#consumer'],
+    'tv': ['#chrome'],
+    'mark': ['#chrome'],
+    'bhargav': ['#chrome'],
+    'toby': ['#chrome']
 }
 
 channel_to_prefixes = defaultdict(list)
@@ -32,6 +31,4 @@ for k, vs in prefix_to_channels.iteritems():
 
 # This is populated by requests from wicks to /register_prefix
 wick_daemons = {
-	#TODO remove
-	'bomb': '10.10.7.110:5000'
 }
