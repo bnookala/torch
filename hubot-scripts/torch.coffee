@@ -36,22 +36,22 @@ module.exports = (robot) ->
     tellTorch msg, 'enumerate'
 
   robot.respond /list tabs on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/list'
+    tellTorch msg, "#{msg.match[1]}/list"
 
   robot.respond /what's on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/details'
+    tellTorch msg, "#{msg.match[1]}/details"
 
   robot.respond /show (\S+) on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[2]}/show', {'cmd': msg.match[1]}
+    tellTorch msg, "#{msg.match[2]}/show", {'cmd': msg.match[1]}
 
   robot.respond /close tab on (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/close'
+    tellTorch msg, "#{msg.match[1]}/close"
 
   robot.respond /refresh (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/refresh'
+    tellTorch msg, "#{msg.match[1]}/refresh"
 
-  robot.respond /next (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/next'
+  robot.respond /show next (\w+$)/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/next"
 
-  robot.respond /prev(ious)? (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/previous'
+  robot.respond /show prev(ious)? (\w+$)/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/previous"
