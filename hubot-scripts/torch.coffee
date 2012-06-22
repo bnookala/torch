@@ -11,7 +11,7 @@
 
 qs = require 'querystring'
 
-TORCH_ADDRESS = 'localhost:9001'
+TORCH_ADDRESS = '127.0.0.1:9001'
 
 tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
@@ -21,6 +21,10 @@ tellTorch = (msg, path, extra={}) ->
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
       if res.statusCode == 200
+        body = JSON.parse body
+        if body.success? and not body.success
+          msg.send body.msg
+          return
         msg.send body
       else
         msg.send err
