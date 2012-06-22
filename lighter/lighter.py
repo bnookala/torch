@@ -68,7 +68,10 @@ def list_tabs(screen):
     host = _get_host_or_404(screen)
 
     wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
-    return json.dumps(wick_req.json)
+    wick_req_str = ''
+    for screen, data in wick_req.json.iteritems():
+        wick_req_str += screen + ': ' + data.get('title', '???') + ' (' + data.get('url', '???') + ')\n'
+    return wick_req_str
 
 @app.route('/<screen>/details', methods=['GET'])
 def tab_details(screen):
