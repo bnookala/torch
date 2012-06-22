@@ -1,8 +1,24 @@
 from collections import defaultdict
 
+#     [ marley ] (lives on dev12)
+#         |
+#         | messages go from irc to internet
+#         |
+#     [ lighter ] (also lives on dev12)
+#       / | \
+#     /   |   \   (internet magic http dust)
+#   ...   |   ...
+#         |
+#      [ wick ] (lives on a TV machine, has a 'prefix')
+#        /|\
+#         |    (connected to multiple browsers, indexed prefix1, prefix2, etc)
+#         |
+#     [ browser ]
+#        /|\
+#        tabs..
+
 prefix_to_channels = {
-    'test': ['marley', 'consumer'],
-    'bomb': ['marley', 'consumer'],
+    'bomb': ['#chrome', '#marley', '#consumer'],
 }
 
 channel_to_prefixes = defaultdict(list)
