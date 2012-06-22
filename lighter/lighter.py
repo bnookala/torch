@@ -12,6 +12,15 @@ def _get_host_or_404(screen):
 
     return host
 
+def control_access(fn):
+    def wrapped(screen):
+        passed_channel = request.headers.get('X-Channel')
+        needed_channel = config.screen_to_channel(screen)
+        if passed_channel != needed_channel:
+            return json.dumps({'success': False, 'msg': "you can't do that from this channel"})
+        return fn(screen)
+    return wrapped
+
 @app.route('/list', methods=['GET'])
 def list():
     pass
@@ -21,6 +30,7 @@ def enumerate():
     pass
 
 @app.route('/<screen>/list', methods=['GET'])
+@control_access
 def list_tabs(screen):
     host = _get_host_or_404(screen)
 
