@@ -15,6 +15,6 @@ def get_tab_urls(screen):
 	url_lines = applescripts.run_script(applescripts.GET_TAB_URLS % {
 		'window': _screen_index(screen),
 	})
-	# Last line returned by GET_TAB_URLS will be a newline
-	url_lines = url_lines.split('\n')[:-1]
+	# Last 2 lines returned by GET_TAB_URLS will be newlines
+	url_lines = url_lines.split('\n')[:-2]
 	return dict(zip(range(1,len(url_lines)+1), url_lines))
