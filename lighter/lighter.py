@@ -12,6 +12,9 @@ def _get_host_or_404(screen):
 
     return host
 
+def _stringify_request_uri(host, screen, cmd):
+    return 'http://' + host + '/' + screen + '/' + cmd
+
 @app.route('/list', methods=['GET'])
 def list():
     pass
@@ -24,15 +27,15 @@ def enumerate():
 def list_tabs(screen):
     host = _get_host_or_404(screen)
 
-    wick_req = requests.get('http://' + host + '/' + screen + '/tabs')
-    return str(wick_req.json)
+    wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
+    return json.dumps(wick_req.json)
 
 @app.route('/<screen>/details', methods=['GET'])
 def tab_details(screen):
     host = _get_host_or_404(screen)
 
-    wick_req = requests.get('http://' + host + '/' + screen + '/active_tab')
-    return str(wick_req.json)
+    wick_req = requests.get(_stringify_request_uri(host, screen, 'active_tab'))
+    return json.dumps(wick_req.json)
 
 @app.route('/<screen>/show', methods=['GET'])
 def show(screen):
@@ -44,10 +47,14 @@ def close(screen):
 
 @app.route('/<screen>/refresh', methods=['GET'])
 def refresh(screen):
-    pass
+    host = _get_host_or_404(screen)
+
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'reload'))
+    return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
 def next(screen):
+    host = _get_host_or_404(screen)
     pass
 
 @app.route('/<screen>/previous', methods=['GET'])
