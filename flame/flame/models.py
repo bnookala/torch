@@ -11,14 +11,13 @@ class Screen(object):
 class Command(object):
     def __init__(self, screen=None):
         self.screen = screen
-        self.command_type = None
 
     def __getitem__(self, cmd):
-        if not self.command and cmd in config.cmd_list:
-            self.command = cmd
-        return self
+        if cmd in config.cmd_list:
+            return command_types[cmd](screen=self.screen)
 
     def execute(self):
+        """To be implemented by the subclasses"""
         pass
 
 class Close(Command):
@@ -31,7 +30,7 @@ class Desc(Command):
 
 class Info(Command):
     def execute(self):
-        pass
+        print 'test'
 
 class List(Command):
     def execute(self):
@@ -60,3 +59,18 @@ class Restart(Command):
 class Show(Command):
     def execute(self):
         pass
+
+command_types = {
+    'close': Close,
+    'desc': Desc,
+    'info': Info,
+    'list': List,
+    'next': Next,
+    'previous': Previous,
+    'tabs': Tabs,
+    'refresh': Refresh,
+    'restart': Restart,
+    'show': Show,
+}
+
+
