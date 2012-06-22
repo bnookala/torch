@@ -17,17 +17,20 @@ tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
   path = path + '?' + data
 
-  msg.http('http://' + TORCH_ADDRESS)
-    .path(path)
-    .port('5000')
-    .header('X-User', msg.message.user.name)
-    .header('X-Channel', msg.message.user.room)
-    .get() (err, res, body) ->
-      if res.statusCode == 200
-        body = "ok, sure" if body == "null"
-        msg.send body
-      else
-        msg.send "some shit is fucked up"
+  try
+    msg.http('http://' + TORCH_ADDRESS)
+      .path(path)
+      .port('5000')
+      .header('X-User', msg.message.user.name)
+      .header('X-Channel', msg.message.user.room)
+      .get() (err, res, body) ->
+        if res.statusCode == 200
+          body = "ok, sure" if body == "null"
+          msg.send body
+        else
+          msg.send "some shit is fucked up"
+  catch error
+    msg.send "lighter shat itself: " + error
 
 module.exports = (robot) ->
   robot.respond /list screens$/i, (msg) ->
@@ -62,3 +65,10 @@ module.exports = (robot) ->
 
   robot.respond /fullscreen off (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/fullscreen_off"
+
+  robot.respond /rotate (\w+)(\severy)?(\d+)?(\ssecond)?s?$/i, (msg) ->
+    time = parseInt(msg.match[3] or '5')
+    tellTorch msg, "#{msg.match[1]}/rotate", {'enabled': true, 'time': time}
+
+  robot.respond /stop rotating (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/rotate", {'enabled': false}

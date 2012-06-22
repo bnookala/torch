@@ -176,11 +176,9 @@ def fullscreen_off(screen):
 def rotate(screen):
     host = _get_host_or_404(screen)
     rotate = request.args['enabled']
-    time_delay = request.args.get('time', None)
+    time_delay = request.args.get('time', 5)
     if not rotate:
         abort(404)
-    if not time_delay:
-        time_delay = 5
 
     f = open('rotate_pids', 'r+')
     pickled_pids = pickle.load(f)
