@@ -146,7 +146,7 @@ def show(screen):
 
         # _get_y_url checks y to see if the alias exists.
         new_url = _get_y_url(index)
-        if y_url is None:
+        if new_url is None:
             new_url = str(index)
 
         # Try to find the url among the open tabs and activate it if found
