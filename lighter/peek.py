@@ -17,7 +17,7 @@ if not new_url:
 
 wick_req = requests.post(_stringify_request_uri(host, screen, 'new_tab'), data={'url': new_url})
 # Lock the screen.
-wick_req = requests.post(_stringify_request_uri(host, screen, 'lock')
+wick_req = requests.post(_stringify_request_uri(host, screen, 'lock'))
 time.sleep(int(duration))
 # Unlock the screen.
 wick_req = requests.post(_stringify_request_uri(host, screen, 'lock')
