@@ -22,8 +22,8 @@ def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
-        if passed_channel not in config.screen_to_channels(screen):
-            return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % user})
+        if passed_channel not in config.screen_to_channels[screen]:
+            return "you can't do that from this channel, %s" % user
         return fn(screen)
     return wrapped
 
