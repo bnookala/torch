@@ -102,9 +102,11 @@ def show_big_text(screen, text):
 	# ugh i feel so so dirty
 	execute_script(screen, javascripts.SHOW_BIG_TEXT % {'text': text.replace('"', '\\"')})
 
-def enumerate_tabs():
+def list_screens():
 	global ids_to_screen_names
 	_refresh_ids()
-	for name in ids_to_screen_names.values():
-		show_big_text(name, name)
 	return sorted(ids_to_screen_names.values())
+
+def enumerate_screens():
+	for name in list_screens():
+		show_big_text(name, name)

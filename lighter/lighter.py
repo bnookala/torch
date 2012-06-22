@@ -6,7 +6,7 @@ from flask import Flask, request, abort
 app = Flask(__name__)
 
 def _get_host_or_404(screen):
-    host = config.wick_daemons.get(_screen_to_prefix(screen).group(1), None)
+    host = config.wick_daemons.get(_screen_to_prefix(screen), None)
 
     if not host:
         abort(404)
@@ -20,31 +20,39 @@ def _stringify_simple_uri(host, cmd):
     return 'http://' + host + '/' + cmd
 
 def _screen_to_prefix(screen):
-	return re.match(r'(.*[^0-9])[0-9]+', screen)
+	return re.match(r'(.*[^0-9])[0-9]+', screen).group(1)
 
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
-        import ipdb; ipdb.set_trace()
-        if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen).group(1), {}):
+        print config.prefix_to_channels
+        if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen), {}):
             return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
         return fn(screen)
     return wrapped
 
 @app.route('/list', methods=['GET'])
 def list_screens():
+    screens = []
     channel = request.headers.get('X-Channel', None)
-    if channel:
-        return json.dumps(config.channel_to_prefixes[channel])
+    prefixes = config.channel_to_prefixes.get(channel, [])
+    for prefix in prefixes:
+        host = config.wick_daemons.get(prefix)
+        if host:
+            screens_on_wick = requests.get(_stringify_simple_uri(host), 'list').json
+            screens.extend(screens_on_wick)
+	screens = sorted(set(screens))
+    return ', '.join(sorted(screens)) if screens else 'sorry, no screens for you'
 
 @app.route('/enumerate', methods=['GET'])
 def enumerate_screens():
     channel = request.headers.get('X-Channel', None)
     if channel:
-        for screen in config.channel_to_prefixes[channel]:
-            requests.post(_stringify_simple_uri(_get_host_or_404(screen), screen, 'enumerate'))
-        return "enumerating..."
+        for prefix in config.channel_to_prefixes[channel]:
+			if prefix in config.wick_daemons:
+				requests.post(_stringify_simple_uri(config.wick_daemons[prefix], 'enumerate'))
+	return "enumerating..."
 
 @app.route('/<screen>/list', methods=['GET'])
 @control_access
