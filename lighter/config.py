@@ -19,6 +19,10 @@ from collections import defaultdict
 
 prefix_to_channels = {
     'bomb': ['#chrome', '#marley', '#consumer'],
+    'test': ['#chrome', '#marley', '#consumer'],
+    'testB': ['#chrome', '#marley', '#consumer'],
+    'mark': ['#chrome', '#marley', '#consumer'],
+    'bhargav': ['#chrome', '#marley', '#consumer'],
 }
 
 channel_to_prefixes = defaultdict(list)
