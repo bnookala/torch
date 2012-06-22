@@ -1,10 +1,19 @@
 import json
+import requests
 
 from flask import Flask, request
 
 import browser
+import config
 
 app = Flask(__name__)
+
+def _register_prefix():
+	"Tell the lighter host what screens this wick controls."
+	requests.post('http://' + config.lighter_host + '/register_prefix', {
+		'prefix': config.screen_name_prefix,
+		'port': config.port,
+	})
 
 def browser_action(fn, screen, *args):
 	"To save some typing. args are expected params in the request."
@@ -67,4 +76,5 @@ def enumerate_tabs():
 	return json.dumps(browser.enumerate_tabs())
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', debug=True)
+	app.run(host='0.0.0.0', port=config.port, debug=True)
+	_register_prefix()

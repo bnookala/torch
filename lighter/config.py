@@ -1,14 +1,14 @@
-import defaultdict
+from collections import defaultdict
 
-screen_to_channels = {
+prefix_to_channels = {
     'test': ['marley', 'consumer'],
+    'bomb': ['marley', 'consumer'],
 }
 
-channel_to_screens = defaultdict(list)
-for k, vs in screen_to_channels.iteritems():
+channel_to_prefixes = defaultdict(list)
+for k, vs in prefix_to_channels.iteritems():
     for v in vs:
-        channel_to_screens[v].append(k)
+        channel_to_prefixes[v].append(k)
 
-wick_daemons = {
-	'test': '10.10.6.88:5000'
-}
+# This is populated by requests from wicks to /register_prefix
+wick_daemons = {}
