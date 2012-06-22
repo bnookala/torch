@@ -106,6 +106,7 @@ def show(screen):
 
 
 @app.route('/<screen>/close', methods=['GET'])
+@control_access
 def close(screen):
     host = _get_host_or_404(screen)
 
@@ -121,6 +122,7 @@ def refresh(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
+@control_access
 def next(screen):
     host = _get_host_or_404(screen)
 
@@ -128,6 +130,7 @@ def next(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/prev', methods=['GET'])
+@control_access
 def previous(screen):
     host = _get_host_or_404(screen)
 
