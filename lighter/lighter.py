@@ -68,6 +68,9 @@ def list_tabs(screen):
     host = _get_host_or_404(screen)
 
     wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
+    if not wick_req.json:
+        return "%s? i don't know about no %s"
+
     wick_req_str = ''
     for screen, data in wick_req.json.iteritems():
         wick_req_str += screen + ': ' + data.get('title', '???') + ' (' + data.get('url', '???') + ')\n'
