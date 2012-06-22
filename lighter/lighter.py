@@ -39,7 +39,7 @@ def list_screens():
     for prefix in prefixes:
         host = config.wick_daemons.get(prefix)
         if host:
-            screens_on_wick = requests.get(_stringify_simple_uri(host), 'list').json
+            screens_on_wick = requests.get(_stringify_simple_uri(host, 'list')).json
             screens.extend(screens_on_wick)
 	screens = sorted(set(screens))
     return ', '.join(sorted(screens)) if screens else 'sorry, no screens for you'
