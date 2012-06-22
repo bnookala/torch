@@ -57,13 +57,13 @@ def next_tab(screen):
 def prev_tab(screen):
 	return browser_action(browser.prev_tab, screen)
 
-@app.route('/<screen>/presentation_mode_on', methods=['POST'])
-def presentation_mode_on(screen):
+@app.route('/<screen>/fullscreen_on', methods=['POST'])
+def fullscreen_on(screen):
 	browser.presentation_mode(screen, True)
 	return 'ok'
 
-@app.route('/<screen>/presentation_mode_off', methods=['POST'])
-def presentation_mode_off(screen):
+@app.route('/<screen>/fullscreen_off', methods=['POST'])
+def fullscreen_off(screen):
 	browser.presentation_mode(screen, False)
 	return 'ok'
 
@@ -72,8 +72,12 @@ def execute(screen):
 	return browser_action(browser.execute_script, screen, 'script')
 
 @app.route('/enumerate', methods=['POST'])
-def enumerate_tabs():
-	return json.dumps(browser.enumerate_tabs())
+def enumerate_screens():
+	return json.dumps(browser.enumerate_screens())
+
+@app.route('/list', methods=['GET'])
+def list_screens():
+	return json.dumps(browser.list_screens())
 
 if __name__ == "__main__":
 	app.run(host='0.0.0.0', port=config.port, debug=True)

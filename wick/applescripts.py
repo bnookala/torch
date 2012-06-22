@@ -58,7 +58,7 @@ tell application "Google Chrome"
 	set i to 0
 	repeat with t in (tabs of window %(window)s)
 		set i to i + 1
-		set res to res & (URL of tab i of window %(window)s) & " " & (title of tab i of window 1) & "
+		set res to res & (URL of tab i of window %(window)s) & " " & (title of tab i of window %(window)s) & "
 "
 	end repeat
 end tell

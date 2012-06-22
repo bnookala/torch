@@ -9,8 +9,16 @@ import subprocess
 from flask import Flask, request, abort
 app = Flask(__name__)
 
+@app.route('/register_prefix', methods=['POST'])
+def register_prefix():
+    "Wick instances make requests to this to register the screens they control"
+    config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
+    print "wick daemons:"
+    print config.wick_daemons
+    return 'ok'
+
 def _get_host_or_404(screen):
-    host = config.wick_daemons.get(_screen_to_prefix(screen).group(1), None)
+    host = config.wick_daemons.get(_screen_to_prefix(screen), None)
 
     if not host:
         abort(404)
@@ -24,33 +32,40 @@ def _stringify_simple_uri(host, cmd):
     return 'http://' + host + '/' + cmd
 
 def _screen_to_prefix(screen):
-    return re.match(r'(.*[^0-9])[0-9]+', screen)
+    return re.match(r'(.*[^0-9])[0-9]+', screen).group(1)
 
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
-        passed_channel = request.headers.get('X-Channel')
-        if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen).group(1), {}):
-            return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
+        channel = request.headers.get('X-Channel')
+        if channel not in config.prefix_to_channels.get(_screen_to_prefix(screen), {}):
+            return "you can't fuck with %s from %s, %s" % (screen, channel, (user or 'jerk'))
         return fn(screen)
     return wrapped
 
 @app.route('/list', methods=['GET'])
 def list_screens():
+    screens = []
     channel = request.headers.get('X-Channel', None)
-    if channel:
-        return json.dumps(config.channel_to_prefixes[channel])
+    prefixes = config.channel_to_prefixes.get(channel, [])
+    for prefix in prefixes:
+        host = config.wick_daemons.get(prefix)
+        if host:
+            screens_on_wick = requests.get(_stringify_simple_uri(host, 'list')).json
+            screens.extend(screens_on_wick)
+    screens = sorted(set(screens))
+    return ', '.join(sorted(screens)) if screens else 'sorry, no screens for you'
 
 @app.route('/enumerate', methods=['GET'])
 def enumerate_screens():
     channel = request.headers.get('X-Channel', None)
     if channel:
-        for screen in config.channel_to_prefixes[channel]:
-            requests.post(_stringify_simple_uri(_get_host_or_404(screen), screen, 'enumerate'))
-        return "enumerating..."
+        for prefix in config.channel_to_prefixes[channel]:
+            if prefix in config.wick_daemons:
+                requests.post(_stringify_simple_uri(config.wick_daemons[prefix], 'enumerate'))
+    return "enumerating..."
 
 @app.route('/<screen>/list', methods=['GET'])
-@control_access
 def list_tabs(screen):
     host = _get_host_or_404(screen)
 
@@ -58,7 +73,6 @@ def list_tabs(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/details', methods=['GET'])
-@control_access
 def tab_details(screen):
     host = _get_host_or_404(screen)
 
@@ -94,31 +108,31 @@ def show(screen):
         wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
         open_tabs = wick_req.json
 
-        y_req = requests.get('http://y/' + index)
+        y_req = requests.get('http://y/' + index, timeout=5)
 
-        # A 200 response means http://y/ has a short link
         if y_req.status_code == 200:
+            # A 200 response means http://y/ has a short link
             new_url = y_req.url
-            for k, v in open_tabs.iteritems():
-                if v['url'] == new_url:
-                    payload = "index=" + str(k)
-                    wick_req = requests.post(
-                                    _stringify_request_uri(host, screen, 'activate_tab'),
-                                    data=payload
-                                )
-                    break
-                return "ok"
         else:
-            # Else interpret as an actual URL and attempt to load the tab
-            payload = "url=" + str(index)
-            wick_req = requests.post(
-                        _stringify_request_uri(host, screen, 'new_tab'),
-                        data=payload
-                    )
-            return "ok"
+            # Else interpret as an actual URL
+            new_url = str(index)
+
+        # Try to find the url among the open tabs and activate it if found
+        for k, v in open_tabs.iteritems():
+            if v['url'] == new_url:
+                wick_req = requests.post(
+                                _stringify_request_uri(host, screen, 'activate_tab'),
+                                data={'index': k}
+                            )
+                return "ok, i showed that for you" if wick_req.status_code == 200 else "something went wrong showing you that tab"
+        # If not found, open in a new tab
+        wick_req = requests.post(
+                    _stringify_request_uri(host, screen, 'new_tab'),
+                    data={'url': new_url},
+                )
+        return "ok" if wick_req.status_code == 200 else "something went wrong opening that for you. it may be an omen."
 
 @app.route('/<screen>/close', methods=['GET'])
-@control_access
 def close(screen):
     host = _get_host_or_404(screen)
 
@@ -126,7 +140,6 @@ def close(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/refresh', methods=['GET'])
-@control_access
 def refresh(screen):
     host = _get_host_or_404(screen)
 
@@ -134,7 +147,6 @@ def refresh(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
-@control_access
 def next(screen):
     host = _get_host_or_404(screen)
 
@@ -142,19 +154,23 @@ def next(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/prev', methods=['GET'])
-@control_access
 def previous(screen):
     host = _get_host_or_404(screen)
 
     wick_req = requests.post(_stringify_request_uri(host, screen, 'prev_tab'))
     return json.dumps(wick_req.json)
 
-@app.route('/register_prefix', methods=['POST'])
-def register_prefix():
-    config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
-    print "wick daemons:"
-    print config.wick_daemons
-    return 'ok'
+@app.route('/<screen>/fullscreen_on', methods=['GET'])
+def fullscreen_on(screen):
+    host = _get_host_or_404(screen)
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'fullscreen_on'))
+    return wick_req.text
+
+@app.route('/<screen>/fullscreen_off', methods=['GET'])
+def fullscreen_off(screen):
+    host = _get_host_or_404(screen)
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'fullscreen_off'))
+    return wick_req.text
 
 @app.route('/<screen>/rotate', methods=['GET'])
 def rotate(screen):

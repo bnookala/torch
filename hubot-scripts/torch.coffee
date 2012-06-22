@@ -24,6 +24,7 @@ tellTorch = (msg, path, extra={}) ->
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
       if res.statusCode == 200
+        body = "ok, sure" if body == "null"
         msg.send body
       else
         msg.send "some shit is fucked up"
@@ -32,26 +33,32 @@ module.exports = (robot) ->
   robot.respond /list screens$/i, (msg) ->
     tellTorch msg, 'list'
 
-  robot.respond /show screens$/i, (msg) ->
+  robot.respond /(show|enumerate|enum) screens$/i, (msg) ->
     tellTorch msg, 'enumerate'
 
   robot.respond /list tabs on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/list'
+    tellTorch msg, "#{msg.match[1]}/list"
 
   robot.respond /what's on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/details'
+    tellTorch msg, "#{msg.match[1]}/details"
 
   robot.respond /show (\S+) on (\w+)$/i, (msg) ->
-    tellTorch msg, '#{msg.match[2]}/show', {'cmd': msg.match[1]}
+    tellTorch msg, "#{msg.match[2]}/show", {'tab': msg.match[1]}
 
-  robot.respond /close tab on (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/close'
+  robot.respond /close tab on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/close"
 
-  robot.respond /refresh (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/refresh'
+  robot.respond /refresh (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/refresh"
 
-  robot.respond /next (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/next'
+  robot.respond /next tab on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/next"
 
-  robot.respond /prev(ious)? (\w+$)/i, (msg) ->
-    tellTorch msg, '#{msg.match[1]}/previous'
+  robot.respond /prev(ious)? tab on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[2]}/prev"
+
+  robot.respond /fullscreen on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/fullscreen_on"
+
+  robot.respond /fullscreen off (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/fullscreen_off"
