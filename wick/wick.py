@@ -11,16 +11,6 @@ def browser_action(fn, screen, *args):
 	fn(screen, *(request.form[arg] for arg in args))
 	return 'ok'
 
-@app.route('/<screen>/execute', methods=['POST'])
-def execute(screen):
-	script = request.form['script']
-	return 'ok'
-
-@app.route('/enumerate', methods=['POST'])
-def enumerate():
-	#TODO we should index the windows based on their unique ids
-	return 'ok'
-
 @app.route('/<screen>/tabs', methods=['GET'])
 def tabs(screen):
 	return json.dumps(browser.get_tab_info(screen))
@@ -44,11 +34,11 @@ def activate_tab(screen):
 
 @app.route('/<screen>/reload', methods=['POST'])
 def reload(screen):
-	return browser_action(browser.reload_tab, screen, 'index')
+	return browser_action(browser.reload_tab, screen)
 
 @app.route('/<screen>/close_tab', methods=['POST'])
 def close_tab(screen):
-	return browser_action(browser.close_tab, screen, 'index')
+	return browser_action(browser.close_tab, screen)
 
 @app.route('/<screen>/next_tab', methods=['POST'])
 def next_tab(screen):
@@ -58,5 +48,23 @@ def next_tab(screen):
 def prev_tab(screen):
 	return browser_action(browser.prev_tab, screen)
 
+@app.route('/<screen>/presentation_mode_on', methods=['POST'])
+def presentation_mode_on(screen):
+	browser.presentation_mode(screen, True)
+	return 'ok'
+
+@app.route('/<screen>/presentation_mode_off', methods=['POST'])
+def presentation_mode_off(screen):
+	browser.presentation_mode(screen, False)
+	return 'ok'
+
+@app.route('/<screen>/execute', methods=['POST'])
+def execute(screen):
+	return browser_action(browser.execute_script, screen, 'script')
+
+@app.route('/enumerate', methods=['POST'])
+def enumerate_tabs():
+	return json.dumps(browser.enumerate_tabs())
+
 if __name__ == "__main__":
-	app.run(host='0.0.0.0')
+	app.run(host='0.0.0.0', debug=True)
