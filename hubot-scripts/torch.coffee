@@ -11,7 +11,7 @@
 
 qs = require 'querystring'
 
-TORCH_ADDRESS = '127.0.0.1:9001'
+TORCH_ADDRESS = '10.10.1.107:5000'
 
 tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
