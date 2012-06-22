@@ -1,3 +1,12 @@
+CHANNEL = {
+    'consumer1': 'consumer',
+    'consumer2': 'consumer',
+    'consumer3': 'consumer',
+    'community1': 'community',
+    'community2': 'community',
+    }
+
+
 cmd_list = [
         'close',
         'desc',
@@ -20,9 +29,9 @@ screen_list = [
 ]
 
 SCREEN_TO_ADDRESS = {
-    'consumer1': ('0.0.0.0', 5000),
-    'consumer2': ('0.0.0.0', 5000),
-    'consumer3': ('0.0.0.0', 5000),
-    'community1': ('0.0.0.0', 5000),
-    'community2': ('0.0.0.0', 5000),
+    'consumer1': '0.0.0.0:5000',
+    'consumer2': '0.0.0.0:5000',
+    'consumer3': '0.0.0.0:5000',
+    'community1': '0.0.0.0:5000',
+    'community2': '0.0.0.0:5000',
 }

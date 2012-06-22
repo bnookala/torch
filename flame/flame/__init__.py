@@ -9,6 +9,7 @@ def main(global_config, **settings):
     """
     def get_root(self):
         return(Screen())
+
     config = Configurator(root_factory=get_root, settings=settings)
     config.add_renderer('jsonp', JSONP(param_name='callback'))
     config.scan()
