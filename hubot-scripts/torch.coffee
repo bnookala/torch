@@ -15,8 +15,12 @@ TORCH_ADDRESS = 'localhost:9001'
 
 tellTorch = (msg, command, screen, extra) ->
   data = qs.stringify extra
+  path = '/#{command}?#{data}'
+  if screen?
+    path = '/#{screen}' + path
+
   msg.http('http://#{TORCH_ADDRESS}')
-    .path('/#{screen}/#{command}?#{data}')
+    .path(path)
     .header('X-Username', msg.message.user.name)
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
