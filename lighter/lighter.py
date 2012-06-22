@@ -58,9 +58,52 @@ def tab_details(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/show', methods=['GET'])
-@control_access
 def show(screen):
-    pass
+    index = request.args['tab']
+    if not index:
+        # We need the tab index to continue
+        abort(404)
+
+    host = _get_host_or_404(screen)
+
+    try:
+        # index is a tab value
+        index = int(index)
+    except ValueError:
+        # index is a url
+        index = str(index)
+
+    if type(index) is int:
+        payload = "index=" + str(index)
+        wick_req = requests.post(
+                        _stringify_request_uri(host, screen, 'activate_tab'),
+                        data=payload
+                    )
+        return "ok"
+    else:
+        wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
+        open_tabs = wick_req.json
+
+        y_req = requests.get('http://y/' + index)
+        if y_req.status_code == 200:
+            new_url = y_req.url
+            for k, v in open_tabs.iteritems():
+                if v['url'] == new_url:
+                    payload = "index=" + str(k)
+                    wick_req = requests.post(
+                                    _stringify_request_uri(host, screen, 'activate_tab'),
+                                    data=payload
+                                )
+                    break
+                return "ok"
+        else:
+            payload = "url=" + str(index)
+            wick_req = requests.post(
+                        _stringify_request_uri(host, screen, 'new_tab'),
+                        data=payload
+                    )
+            return "ok"
+
 
 @app.route('/<screen>/close', methods=['GET'])
 def close(screen):
@@ -70,8 +113,8 @@ def close(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/refresh', methods=['GET'])
-@control_access
 def refresh(screen):
+    tab_index = request.form['tab']
     host = _get_host_or_404(screen)
 
     wick_req = requests.post(_stringify_request_uri(host, screen, 'reload'))
@@ -92,4 +135,5 @@ def previous(screen):
     return json.dumps(wick_req.json)
 
 if __name__ == "__main__":
+    app.debug=True
     app.run(host='0.0.0.0')

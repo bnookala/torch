@@ -1,4 +1,4 @@
-import defaultdict
+from collections import defaultdict
 
 screen_to_channels = {
     'test': ['marley', 'consumer'],
@@ -10,5 +10,5 @@ for k, vs in screen_to_channels.iteritems():
         channel_to_screens[v].append(k)
 
 wick_daemons = {
-	'test': '10.10.6.88:5000'
+	'bomb1': '10.10.6.88:5000'
 }
