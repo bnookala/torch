@@ -26,7 +26,6 @@ def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
-        print config.prefix_to_channels
         if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen), {}):
             return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
         return fn(screen)
@@ -156,10 +155,19 @@ def previous(screen):
 
 @app.route('/register_prefix', methods=['POST'])
 def register_prefix():
-	config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
-	print "wick daemons:"
-	print config.wick_daemons
-	return 'ok'
+    config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
+    print "wick daemons:"
+    print config.wick_daemons
+    return 'ok'
+
+@app.route('/<screen>/rotate', methods=['GET'])
+@control_access
+def rotate():
+    host = _get_host_or_404(screen)
+    rotate = request.args['enabled']
+    if not rotate:
+        abort(404)
+    return 'ok'
 
 if __name__ == "__main__":
     app.debug=True
