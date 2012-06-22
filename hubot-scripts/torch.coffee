@@ -11,14 +11,14 @@
 
 qs = require 'querystring'
 
-TORCH_ADDRESS = '10.10.1.107'
+LIGHTER_ADDRESS = '10.10.1.107'
 
 tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
   path = path + '?' + data
 
   try
-    msg.http('http://' + TORCH_ADDRESS)
+    msg.http('http://' + LIGHTER_ADDRESS)
       .path(path)
       .port('5000')
       .header('X-User', msg.message.user.name)
@@ -72,3 +72,6 @@ module.exports = (robot) ->
 
   robot.respond /stop rotating (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/rotate", {'enabled': false}
+
+  robot.respond /peek(\sat)? (\S+) on (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[3]}/peek", {'url': msg.match[2]}

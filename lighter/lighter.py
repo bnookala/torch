@@ -31,13 +31,6 @@ def safe_request_fn(fn):
 requests.post = safe_request_fn(requests.post)
 requests.get = safe_request_fn(requests.get)
 
-def safe_post(url, *args, **kwargs):
-    try:
-        requests.post(url, *args, **kwargs)
-    except requests.ConnectionError:
-        print url + " is very bad"
-requests.post = safe_post
-
 @app.route('/register_prefix', methods=['POST'])
 def register_prefix():
     "Wick instances make requests to this to register the screens they control"
@@ -140,10 +133,9 @@ def show(screen):
 
     if type(index) is int:
         # Tab index means we can just activate the specific tab instance
-        payload = "index=" + str(index)
         wick_req = requests.post(
                         _stringify_request_uri(host, screen, 'activate_tab'),
-                        data=payload
+                        data={'index': str(index)}
                     )
         return "ok"
     else:
@@ -153,7 +145,7 @@ def show(screen):
 
         # _get_y_url checks y to see if the alias exists.
         new_url = _get_y_url(index)
-        if y_url is None:
+        if new_url is None:
             new_url = str(index)
 
         # Try to find the url among the open tabs and activate it if found
