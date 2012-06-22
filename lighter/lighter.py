@@ -74,6 +74,7 @@ def show(screen):
         index = str(index)
 
     if type(index) is int:
+        # Tab index means we can just activate the specific tab instance
         payload = "index=" + str(index)
         wick_req = requests.post(
                         _stringify_request_uri(host, screen, 'activate_tab'),
@@ -81,10 +82,13 @@ def show(screen):
                     )
         return "ok"
     else:
+        # Otherwise if it is a string, then attempt to search http://y/ for it
         wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
         open_tabs = wick_req.json
 
         y_req = requests.get('http://y/' + index)
+
+        # A 200 response means http://y/ has a short link
         if y_req.status_code == 200:
             new_url = y_req.url
             for k, v in open_tabs.iteritems():
@@ -97,13 +101,13 @@ def show(screen):
                     break
                 return "ok"
         else:
+            # Else interpret as an actual URL and attempt to load the tab
             payload = "url=" + str(index)
             wick_req = requests.post(
                         _stringify_request_uri(host, screen, 'new_tab'),
                         data=payload
                     )
             return "ok"
-
 
 @app.route('/<screen>/close', methods=['GET'])
 @control_access
@@ -115,7 +119,6 @@ def close(screen):
 
 @app.route('/<screen>/refresh', methods=['GET'])
 def refresh(screen):
-    tab_index = request.form['tab']
     host = _get_host_or_404(screen)
 
     wick_req = requests.post(_stringify_request_uri(host, screen, 'reload'))
