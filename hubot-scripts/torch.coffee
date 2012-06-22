@@ -11,23 +11,22 @@
 
 qs = require 'querystring'
 
-TORCH_ADDRESS = '127.0.0.1:9001'
+TORCH_ADDRESS = '10.10.1.107'
 
 tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
+  path = path + '?' + data
 
-  msg.http('http://#{TORCH_ADDRESS}/#{path}?#{data}')
+  msg.http('http://' + TORCH_ADDRESS)
+    .path(path)
+    .port('5000')
     .header('X-User', msg.message.user.name)
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
       if res.statusCode == 200
-        body = JSON.parse body
-        if body.success? and not body.success
-          msg.send body.msg
-          return
         msg.send body
       else
-        msg.send err
+        msg.send "some shit is fucked up"
 
 module.exports = (robot) ->
   robot.respond /list screens$/i, (msg) ->

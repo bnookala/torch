@@ -26,6 +26,7 @@ def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
+        import ipdb; ipdb.set_trace()
         if passed_channel not in config.prefix_to_channels.get(_screen_to_prefix(screen).group(1), {}):
             return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % (user or 'jerk')})
         return fn(screen)
@@ -62,11 +63,59 @@ def tab_details(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/show', methods=['GET'])
-@control_access
 def show(screen):
-    pass
+    index = request.args['tab']
+    if not index:
+        # We need the tab index to continue
+        abort(404)
+
+    host = _get_host_or_404(screen)
+
+    try:
+        # index is a tab value
+        index = int(index)
+    except ValueError:
+        # index is a url
+        index = str(index)
+
+    if type(index) is int:
+        # Tab index means we can just activate the specific tab instance
+        payload = "index=" + str(index)
+        wick_req = requests.post(
+                        _stringify_request_uri(host, screen, 'activate_tab'),
+                        data=payload
+                    )
+        return "ok"
+    else:
+        # Otherwise if it is a string, then attempt to search http://y/ for it
+        wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
+        open_tabs = wick_req.json
+
+        y_req = requests.get('http://y/' + index)
+
+        # A 200 response means http://y/ has a short link
+        if y_req.status_code == 200:
+            new_url = y_req.url
+            for k, v in open_tabs.iteritems():
+                if v['url'] == new_url:
+                    payload = "index=" + str(k)
+                    wick_req = requests.post(
+                                    _stringify_request_uri(host, screen, 'activate_tab'),
+                                    data=payload
+                                )
+                    break
+                return "ok"
+        else:
+            # Else interpret as an actual URL and attempt to load the tab
+            payload = "url=" + str(index)
+            wick_req = requests.post(
+                        _stringify_request_uri(host, screen, 'new_tab'),
+                        data=payload
+                    )
+            return "ok"
 
 @app.route('/<screen>/close', methods=['GET'])
+@control_access
 def close(screen):
     host = _get_host_or_404(screen)
 
@@ -82,6 +131,7 @@ def refresh(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/next', methods=['GET'])
+@control_access
 def next(screen):
     host = _get_host_or_404(screen)
 
@@ -89,6 +139,7 @@ def next(screen):
     return json.dumps(wick_req.json)
 
 @app.route('/<screen>/prev', methods=['GET'])
+@control_access
 def previous(screen):
     host = _get_host_or_404(screen)
 
@@ -103,4 +154,5 @@ def register_prefix():
 	return 'ok'
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.debug=True
+    app.run(host='0.0.0.0')
