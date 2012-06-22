@@ -28,7 +28,7 @@ tellTorch = (msg, path, extra={}) ->
           body = "ok, sure" if body == "null"
           msg.send body
         else
-          msg.send "some shit is fucked up"
+          msg.send "your request is bad and you should feel bad"
   catch error
     msg.send "lighter shat itself: " + error
 

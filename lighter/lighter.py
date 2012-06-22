@@ -64,6 +64,13 @@ def _stringify_simple_uri(host, cmd):
 def _screen_to_prefix(screen):
     return re.match(r'(.*[^0-9])[0-9]+', screen).group(1)
 
+def _get_y_url(query):
+    y_req = requests.get('http://y/' + query, timeout=5)
+    if y_req.status_code == 200:
+        return y_req.url
+    else:
+        return None
+
 def control_access(fn):
     def wrapped(screen):
         user = request.headers.get('X-User')
@@ -100,7 +107,13 @@ def list_tabs(screen):
     host = _get_host_or_404(screen)
 
     wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
-    return json.dumps(wick_req.json)
+    if not wick_req.json:
+        return "%s? i don't know about no %s"
+
+    wick_req_str = ''
+    for screen, data in wick_req.json.iteritems():
+        wick_req_str += screen + ': ' + data.get('title', '???') + ' (' + data.get('url', '???') + ')\n'
+    return wick_req_str
 
 @app.route('/<screen>/details', methods=['GET'])
 def tab_details(screen):
@@ -138,13 +151,9 @@ def show(screen):
         wick_req = requests.get(_stringify_request_uri(host, screen, 'tabs'))
         open_tabs = wick_req.json
 
-        y_req = requests.get('http://y/' + index, timeout=5)
-
-        if y_req.status_code == 200:
-            # A 200 response means http://y/ has a short link
-            new_url = y_req.url
-        else:
-            # Else interpret as an actual URL
+        # _get_y_url checks y to see if the alias exists.
+        new_url = _get_y_url(index)
+        if y_url is None:
             new_url = str(index)
 
         # Try to find the url among the open tabs and activate it if found
@@ -235,6 +244,20 @@ def rotate(screen):
     f.close()
 
     return "ok"
+
+@app.route('/<screen>/peek', methods=['GET'])
+def peek(screen):
+    host = _get_host_or_404(screen)
+    url = request.args['url']
+    duration = request.args.get('duration', None)
+    if not duration:
+        duration = 30
+    if duration > 300:
+        duration = 300
+
+    args = ['./peek.py', host, screen, url, str(duration)]
+    subprocess.Popen(args)
+    return "ok, peaking at " + url
 
 if __name__ == "__main__":
     if not os.path.exists('rotate_pids'):
