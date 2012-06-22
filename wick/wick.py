@@ -87,5 +87,5 @@ def list_screens():
 	return json.dumps(browser.list_screens())
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=config.port, debug=True)
 	_register_prefix()
+	app.run(host='0.0.0.0', port=config.port, debug=True)

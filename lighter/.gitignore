@@ -1,2 +1,3 @@
 venv/*
 rotate_pids
+.wick_daemons

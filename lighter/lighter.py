@@ -6,12 +6,43 @@ import re
 import requests
 import subprocess
 from flask import Flask, request, abort
+from urllib2 import urlparse
 app = Flask(__name__)
+
+WICK_CACHE = '.wick_daemons'
+
+def safe_request_fn(fn):
+    def safe_request(url, *args, **kwargs):
+        try:
+            return fn(url, *args, **kwargs)
+        except requests.ConnectionError:
+            # take this host out of the list of wicks
+            host = urlparse.urlparse(url).netloc
+            bad_wicks = set()
+            for key, val in config.wick_daemons.iteritems():
+                if host in val:
+                    bad_wicks.add(key)
+            for wick in bad_wicks:
+                del config.wick_daemons[wick]
+            pickle.dump(config.wick_daemons, open(WICK_CACHE, 'w'))
+            abort(502)
+    return safe_request
+
+requests.post = safe_request_fn(requests.post)
+requests.get = safe_request_fn(requests.get)
+
+def safe_post(url, *args, **kwargs):
+    try:
+        requests.post(url, *args, **kwargs)
+    except requests.ConnectionError:
+        print url + " is very bad"
+requests.post = safe_post
 
 @app.route('/register_prefix', methods=['POST'])
 def register_prefix():
     "Wick instances make requests to this to register the screens they control"
     config.wick_daemons[request.form['prefix']] = request.remote_addr + ':' + request.form['port']
+    pickle.dump(config.wick_daemons, open(WICK_CACHE, 'w'))
     print "wick daemons:"
     print config.wick_daemons
     return 'ok'
@@ -57,8 +88,9 @@ def _list_and_maybe_enumerate(enumerate):
     for prefix in prefixes:
         host = config.wick_daemons.get(prefix)
         if host:
-            screens_on_wick = requests.get(_stringify_simple_uri(host, cmd)).json
-            screens.extend(screens_on_wick)
+            screens_on_wick = requests.get(_stringify_simple_uri(host, cmd))
+            if screens_on_wick and screens_on_wick.json:
+                screens.extend(screens_on_wick.json)
     screens = sorted(set(screens))
     return ', '.join(sorted(screens)) if screens else 'sorry, no screens for you'
 
@@ -233,6 +265,12 @@ if __name__ == "__main__":
         f = open('rotate_pids', 'w')
         pickle.dump(rotate_pids, f)
         f.close()
+
+    try:
+        cached_wicks = pickle.load(open(WICK_CACHE, 'r'))
+    except IOError:
+        cached_wicks = {}
+    config.wick_daemons.update(cached_wicks)
 
     app.debug=True
     app.run(host='0.0.0.0')
