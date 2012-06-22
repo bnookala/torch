@@ -11,8 +11,4 @@ delay = sys.argv[3]
 
 while(True):
     wick_req = requests.post(_stringify_request_uri(host, screen, 'next_tab'))
-    # lock the screen
-    wick_req = requests.post(_stringify_request_uri(host, screen, 'lock'))
     time.sleep(int(delay))
-    # unlock the screen
-    wick_req = requests.post(_stringify_request_uri(host, screen, 'lock'))
