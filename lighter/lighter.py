@@ -31,13 +31,6 @@ def safe_request_fn(fn):
 requests.post = safe_request_fn(requests.post)
 requests.get = safe_request_fn(requests.get)
 
-def safe_post(url, *args, **kwargs):
-    try:
-        requests.post(url, *args, **kwargs)
-    except requests.ConnectionError:
-        print url + " is very bad"
-requests.post = safe_post
-
 @app.route('/register_prefix', methods=['POST'])
 def register_prefix():
     "Wick instances make requests to this to register the screens they control"
