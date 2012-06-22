@@ -17,7 +17,7 @@ tellTorch = (msg, path, extra={}) ->
   data = qs.stringify extra
 
   msg.http('http://#{TORCH_ADDRESS}/#{path}?#{data}')
-    .header('X-Username', msg.message.user.name)
+    .header('X-User', msg.message.user.name)
     .header('X-Channel', msg.message.user.room)
     .get() (err, res, body) ->
       if res.statusCode == 200

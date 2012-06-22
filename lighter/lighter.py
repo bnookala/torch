@@ -14,10 +14,11 @@ def _get_host_or_404(screen):
 
 def control_access(fn):
     def wrapped(screen):
+        user = request.headers.get('X-User')
         passed_channel = request.headers.get('X-Channel')
         needed_channel = config.screen_to_channel(screen)
         if passed_channel != needed_channel:
-            return json.dumps({'success': False, 'msg': "you can't do that from this channel"})
+            return json.dumps({'success': False, 'msg': "you can't do that from this channel, %s" % user})
         return fn(screen)
     return wrapped
 
@@ -38,6 +39,7 @@ def list_tabs(screen):
     return str(wick_req.json)
 
 @app.route('/<screen>/details', methods=['GET'])
+@control_access
 def tab_details(screen):
     host = _get_host_or_404(screen)
 
@@ -45,22 +47,27 @@ def tab_details(screen):
     return str(wick_req.json)
 
 @app.route('/<screen>/show', methods=['GET'])
+@control_access
 def show(screen):
     pass
 
 @app.route('/<screen>/close', methods=['GET'])
+@control_access
 def close(screen):
     pass
 
 @app.route('/<screen>/refresh', methods=['GET'])
+@control_access
 def refresh(screen):
     pass
 
 @app.route('/<screen>/next', methods=['GET'])
+@control_access
 def next(screen):
     pass
 
 @app.route('/<screen>/previous', methods=['GET'])
+@control_access
 def previous(screen):
     pass
 
