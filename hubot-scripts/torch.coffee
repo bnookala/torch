@@ -40,3 +40,7 @@ module.exports = (robot) ->
     tellTorch msg, 'close', msg.match[1], {}
   robot.respond /refresh (\w+$)/i, (msg) ->
     tellTorch msg, 'refresh', msg.match[1], {}
+  robot.respond /next (\w+$)/i, (msg) ->
+    tellTorch msg, 'next', msg.match[1], {}
+  robot.respond /prev(ious)? (\w+$)/i, (msg) ->
+    tellTorch msg, 'prev', msg.match[1], {}
