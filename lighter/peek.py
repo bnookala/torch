@@ -20,6 +20,6 @@ wick_req = requests.post(_stringify_request_uri(host, screen, 'new_tab'), data={
 wick_req = requests.post(_stringify_request_uri(host, screen, 'lock'))
 time.sleep(int(duration))
 # Unlock the screen.
-wick_req = requests.post(_stringify_request_uri(host, screen, 'lock')
+wick_req = requests.post(_stringify_request_uri(host, screen, 'lock'))
 wick_req = requests.post(_stringify_request_uri(host, screen, 'close_tab'))
 
