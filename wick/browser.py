@@ -76,7 +76,8 @@ def get_active_tab(screen):
 	info = applescripts.run_script(applescripts.GET_ACTIVE_TAB % {
 		'window': _screen_index(screen),
 	})
-	index, url, title = info.strip().split(' ', 2)
+	index, url = info.strip().split(' ', 1)
+	url, title = url.split(' ', 1) if ' ' in url else (url, url)
 	return {'index': int(index), 'url': url, 'title': title}
 
 def get_tab_info(screen):
