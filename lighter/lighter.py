@@ -133,10 +133,9 @@ def show(screen):
 
     if type(index) is int:
         # Tab index means we can just activate the specific tab instance
-        payload = "index=" + str(index)
         wick_req = requests.post(
                         _stringify_request_uri(host, screen, 'activate_tab'),
-                        data=payload
+                        data={'index': index}
                     )
         return "ok"
     else:
