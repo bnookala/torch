@@ -28,13 +28,13 @@ def control_access(fn):
     return wrapped
 
 @app.route('/list', methods=['GET'])
-def list():
+def list_screens():
     channel = request.headers.get('X-Channel', None)
     if channel:
         return json.dumps(config.channel_to_screens[channel])
 
 @app.route('/enumerate', methods=['GET'])
-def enumerate():
+def enumerate_screens():
     channel = request.headers.get('X-Channel', None)
     if channel:
         for screen in config.channel_to_screens[channel]:
