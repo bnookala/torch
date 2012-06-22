@@ -21,18 +21,18 @@ def handle_command(context, request):
             'success': False,
             'msg': 'Permission Denied',
         }
-    success = command.execute()
+    success = context.execute()
     if success:
         return {
             'success': True,
-            'command': context.command,
+            'command': context,
             'screen': context.screen,
             'address': config.SCREEN_TO_ADDRESS[context.screen],
         }
     return {
         'success': False,
         'msg': 'error sending command to wick',
-        'command': context.command,
+        'command': context,
         'screen': context.screen,
         'address': config.SCREEN_TO_ADDRESS[context.screen],
     }
