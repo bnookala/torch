@@ -18,10 +18,7 @@ from collections import defaultdict
 #        tabs..
 
 prefix_to_channels = {
-    'tv': ['#chrome'],
-    'mark': ['#chrome'],
-    'bhargav': ['#chrome'],
-    'toby': ['#chrome']
+    'menus': ['#chrome', '#consumer', '#menus'],
 }
 
 channel_to_prefixes = defaultdict(list)
