@@ -113,7 +113,7 @@ def tab_details(screen):
     host = _get_host_or_404(screen)
 
     wick_req = requests.get(_stringify_request_uri(host, screen, 'active_tab'))
-    return json.dumps(wick_req.json)
+    return "%s (%s) on tab %s" % (wick_req.json['title'], wick_req.json['url'], wick_req.json['index'])
 
 @app.route('/<screen>/show', methods=['GET'])
 def show(screen):
@@ -249,7 +249,7 @@ def peek(screen):
 
     args = ['./peek.py', host, screen, url, str(duration)]
     subprocess.Popen(args)
-    return "ok, peaking at " + url
+    return "ok, peeking at " + url
 
 @app.route('/nyanwin', methods=['GET'])
 def nyanwin():
