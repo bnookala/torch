@@ -104,8 +104,10 @@ def list_tabs(screen):
         return "%s? i don't know about no %s"
 
     wick_req_str = ''
-    for screen, data in wick_req.json.iteritems():
-        wick_req_str += screen + ': ' + data.get('title', '???') + ' (' + data.get('url', '???') + ')\n'
+    tab_to_content = wick_req.json
+    for tab_index in sorted(tab_to_content.keys(), key=lambda index: int(index)):
+        data = tab_to_content[tab_index]
+        wick_req_str += tab_index + ': ' + data.get('title', '???') + ' (' + data.get('url', '???') + ')\n'
     return wick_req_str
 
 @app.route('/<screen>/details', methods=['GET'])
