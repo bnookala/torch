@@ -20,8 +20,8 @@ from collections import defaultdict
 prefix_to_channels = {
     'menus': ['#chrome', '#consumer', '#menus'],
     'community': ['#community'],
-    'consumera': ['#chrome', '#consumer'],
-    'consumerb': ['#chrome', '#consumer'],
+    'cnsmra': ['#chrome', '#consumer'],
+    'cnsmrb': ['#chrome', '#consumer'],
 }
 
 channel_to_prefixes = defaultdict(list)
