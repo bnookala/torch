@@ -73,5 +73,6 @@ module.exports = (robot) ->
   robot.respond /stop rotating (\w+)$/i, (msg) ->
     tellTorch msg, "#{msg.match[1]}/rotate", {'enabled': false}
 
-  robot.respond /peek(\sat)? (\S+) on (\w+)$/i, (msg) ->
-    tellTorch msg, "#{msg.match[3]}/peek", {'url': msg.match[2]}
+  robot.respond /peek(\sat)? (\S+) on (\w+)(\sfor)?(\d+)?(\ssecond)?s?$/i, (msg) ->
+    time = parseInt(msg.match[5] or '15')
+    tellTorch msg, "#{msg.match[3]}/peek", {'url': msg.match[2], 'duration': time}
