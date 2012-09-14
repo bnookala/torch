@@ -49,6 +49,18 @@ def reload(screen):
 def close_tab(screen):
 	return browser_action(browser.close_tab, screen)
 
+@app.route('/<screen>/bring_to_front', methods=['POST'])
+def bring_to_front(screen):
+	return browser_action(browser.bring_window_to_front, screen)
+
+@app.route('/<screen>/zoom_out', methods=['POST'])
+def zoom_out(screen):
+	return browser_action(browser.zoom_out, screen)
+
+@app.route('/<screen>/zoom_in', methods=['POST'])
+def zoom_in(screen):
+	return browser_action(browser.zoom_in, screen)
+
 @app.route('/<screen>/next_tab', methods=['POST'])
 def next_tab(screen):
 	return browser_action(browser.next_tab, screen)

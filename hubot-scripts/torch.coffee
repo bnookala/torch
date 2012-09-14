@@ -76,3 +76,12 @@ module.exports = (robot) ->
   robot.respond /peek(\sat)? (\S+) on (\w+)(\sfor)?(\d+)?(\ssecond)?s?$/i, (msg) ->
     time = parseInt(msg.match[5] or '15')
     tellTorch msg, "#{msg.match[3]}/peek", {'url': msg.match[2], 'duration': time}
+
+  robot.respond /zoom in (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/zoom_in"
+
+  robot.respond /zoom out (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/zoom_out"
+
+  robot.respond /bring to front (\w+)$/i, (msg) ->
+    tellTorch msg, "#{msg.match[1]}/bring_to_front"

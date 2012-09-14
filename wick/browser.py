@@ -65,6 +65,21 @@ def close_tab(screen):
 		'window': _screen_index(screen),
 	})
 
+def bring_window_to_front(screen):
+	applescripts.run_script(applescripts.BRING_WINDOW_TO_FRONT % {
+		'window': _screen_index(screen),
+	})
+
+def zoom_out(screen):
+	applescripts.run_script(applescripts.ZOOM_OUT_CURRENT_WINDOW % {
+		'window': _screen_index(screen),
+	})
+
+def zoom_in(screen):
+	applescripts.run_script(applescripts.ZOOM_IN_CURRENT_WINDOW % {
+		'window': _screen_index(screen),
+	})
+
 def next_tab(screen):
 	num_tabs = len(get_tab_info(screen))
 	active_index = get_active_tab(screen)['index']

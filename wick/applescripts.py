@@ -29,6 +29,44 @@ CLOSE_TAB = """
 tell application "Google Chrome" to close active tab of window %(window)s
 """
 
+BRING_WINDOW_TO_FRONT = """
+tell application "Google Chrome"
+	set index of window %(window)s to 1
+end tell
+"""
+
+# XXX: need to toggle 'visible' property in order to focus the window to receive the keystroke
+# http://stackoverflow.com/questions/5682413/how-do-i-make-a-safari-window-active-using-applescript-elegantly
+ZOOM_OUT_CURRENT_WINDOW = """
+tell application "Google Chrome"
+	activate
+	set win to window %(window)s
+	tell win
+		set index to 1
+		set visible to false
+		set visible to true
+	end tell
+	tell application "System Events"
+		keystroke "-" using {command down}
+	end tell
+end tell
+"""
+
+ZOOM_IN_CURRENT_WINDOW = """
+tell application "Google Chrome"
+	activate
+	set win to window %(window)s
+	tell win
+		set index to 1
+		set visible to false
+		set visible to true
+	end tell
+	tell application "System Events"
+		keystroke "+" using {command down}
+	end tell
+end tell
+"""
+
 # Newline-delimited list of id x1 y1 x2 y2
 GET_WINDOW_IDS_AND_BOUNDS = """
 set res to ""

@@ -253,6 +253,24 @@ def peek(screen):
     subprocess.Popen(args)
     return "ok, peeking at " + url
 
+@app.route('/<screen>/bring_to_front', methods=['GET'])
+def bring_to_front(screen):
+    host = _get_host_or_404(screen)
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'bring_to_front'))
+    return json.dumps(wick_req.json)
+
+@app.route('/<screen>/zoom_in', methods=['GET'])
+def zoom_in(screen):
+    host = _get_host_or_404(screen)
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'zoom_in'))
+    return json.dumps(wick_req.json)
+
+@app.route('/<screen>/zoom_out', methods=['GET'])
+def zoom_out(screen):
+    host = _get_host_or_404(screen)
+    wick_req = requests.post(_stringify_request_uri(host, screen, 'zoom_out'))
+    return json.dumps(wick_req.json)
+
 @app.route('/nyanwin', methods=['GET'])
 def nyanwin():
     if config.nyanwinning:
