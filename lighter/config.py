@@ -17,6 +17,8 @@ from collections import defaultdict
 #        /|\
 #        tabs..
 
+# mapping from a TV name prefix (defined in a wick instance's config.py)
+# to the IRC channels from which people are allowed to control it.
 prefix_to_channels = {
     'menus': ['#chrome', '#consumer', '#menus'],
     'community': ['#community'],
